@@ -1,0 +1,3 @@
+%OSDK%/bin/pictconv -m0 -f1 -o3img AnarchyLogo_rb.png aldata.c
+
+%OSDK%/bin/pictconv -m0 -f0 -o3img AnarchyLogo_wb.png aldata.c
