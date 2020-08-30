@@ -14,7 +14,7 @@ from tkinter import *
 from tkinter import messagebox
 from PIL import Image
 import os
-
+from proto.fillclip import fillcliper
 # from example import gng, gng2
 
 HiresPixelPerByte=6
@@ -193,19 +193,37 @@ class Memory():
 
 theMemory = None # Memory()
 
+def plot(c,l):
+    global theMemory
+    hidx = c//6
+    pidx = c%6
+    # theMemory.poke (HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx - 1, CHANGE_INK_TO_GREEN)
+    cv = theMemory.peek (HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx);
+    cv |= 0x20>>pidx;
+    theMemory.poke (HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx, cv)
 
 def loadTape():
     global theMemory
     l = 100
     c = 120
-    pattern = 0b01101010
-    hidx = c//6
-    pidx = c%6
-    theMemory.poke (HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx - 1, CHANGE_INK_TO_GREEN)
-    cv = theMemory.peek (HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx);
-    cv |= 0x20>>pidx;
-    theMemory.poke (HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx, cv)
-    theMemory.memcpy(HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx + 1, [pattern]*10, 4)
+    # pattern = 0b01101010
+
+    fillclip = fillcliper([20,180], [120, 140], [20,20])
+
+    for (PL, PR) in fillclip:
+        print (PL, PR)
+        plot(PL[0],PL[1])
+        plot(PR[0],PR[1])
+
+
+    plot(c,l)
+    # hidx = c//6
+    # pidx = c%6
+    # theMemory.poke (HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx - 1, CHANGE_INK_TO_GREEN)
+    # cv = theMemory.peek (HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx);
+    # cv |= 0x20>>pidx;
+    # theMemory.poke (HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx, cv)
+    # theMemory.memcpy(HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx + 1, [pattern]*10, 4)
     DrawRam(img,theMemory.getRam())
 
 def test():
