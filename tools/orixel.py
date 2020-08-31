@@ -15,13 +15,14 @@ from tkinter import messagebox
 from PIL import Image
 import os
 from proto.fillclip import fillcliper
+from proto.mapimage import computePixel
 # from example import gng, gng2
 
 HiresPixelPerByte=6
 
 HiresScreenWidth=240
 HiresScreenHeight=200
-
+filepath = "tools\logo.dat"
 zoomfactor=2
 
 OricViewDefaultScreenSizeX      = HiresScreenWidth*zoomfactor
@@ -192,6 +193,7 @@ class Memory():
         
 
 theMemory = None # Memory()
+imageBuffer = None
 
 def plot(c,l):
     global theMemory
@@ -202,21 +204,39 @@ def plot(c,l):
     cv |= 0x20>>pidx;
     theMemory.poke (HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx, cv)
 
+def isPixelSet (pC, pL):
+    global imageBuffer
+    bytesIndexInLine = pC // 6 
+    bitNumberInBytes = pC % 6
+    cv = 0x20 >> bitNumberInBytes
+    theByte =  imageBuffer[bytesIndexInLine  + pL * 40]
+    val = cv & theByte
+    return (val!=0)
+
 def loadTape():
     global theMemory
     l = 100
     c = 120
     # pattern = 0b01101010
+    P0 = [20,20]
+    P1 = [120, 60]
+    P2 = [20,180]
 
-    fillclip = fillcliper([20,180], [120, 140], [20,20])
+    fillclip = fillcliper(P0, P1, P2)
 
     for (PL, PR) in fillclip:
-        print (PL, PR)
+        # print (PL, PR)
         plot(PL[0],PL[1])
         plot(PR[0],PR[1])
+        Left = min(PL[0], PR[0])
+        Right = max(PL[0], PR[0])
+        for column in range(Left,Right):
+            [pX, pY] = computePixel(P0, P1, P2, column, PR[1])
+            if isPixelSet(pX, pY):
+                plot(column,PR[1])
 
+    # plot(c,l)
 
-    plot(c,l)
     # hidx = c//6
     # pidx = c%6
     # theMemory.poke (HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx - 1, CHANGE_INK_TO_GREEN)
@@ -226,24 +246,19 @@ def loadTape():
     # theMemory.memcpy(HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx + 1, [pattern]*10, 4)
     DrawRam(img,theMemory.getRam())
 
+
+
+
 def test():
-    global theMemory
+    global theMemory, imageBuffer
 
-    filepath = "tools\logo.dat"
-
-    file_length_in_bytes = os.path.getsize(filepath)
-
-    print(f"Reading {file_length_in_bytes} from file {filepath}")
-
-    with open(filepath, "rb") as binary_file:
-        gng3 = binary_file.read()
-
-    print ("Loading bytes in memory")
-    ram = theMemory.getRam()
-    for i in range(0,8000):
-        ram[i] = gng3[i]
-    print ("Refreshing Screen")
-    DrawRam(img,ram)
+    if imageBuffer != None:
+        print ("Loading bytes in memory")
+        ram = theMemory.getRam()
+        for i in range(0,8000):
+            ram[i] = imageBuffer[i]
+        print ("Refreshing Screen")
+        DrawRam(img,ram)
 
 
 
@@ -388,7 +403,23 @@ Video control attributes
 def main():
 
     global img, can
-    global theMemory
+    global theMemory, imageBuffer
+
+    file_length_in_bytes = os.path.getsize(filepath)
+
+    print(f"Reading {file_length_in_bytes} from file {filepath}")
+
+    with open(filepath, "rb") as binary_file:
+        imageBuffer = binary_file.read()
+
+    # pC, pL=105, 29
+    # print (isPixelSet (pC, pL))
+    # pC, pL=119, 56
+    # print (isPixelSet (pC, pL))
+    # pC, pL=120, 90
+    # print (isPixelSet (pC, pL))
+    # pC, pL=120, 112
+    # print (isPixelSet (pC, pL))
 
     print ("Creating Memory")
     theMemory = Memory()
