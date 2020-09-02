@@ -15,7 +15,7 @@ from tkinter import messagebox
 from PIL import Image
 import os
 from proto.fillclip import fillcliper
-from proto.mapimage import computePixel
+from proto.mapimage import computePixel_UL, computePixel_BR
 # from example import gng, gng2
 
 HiresPixelPerByte=6
@@ -221,6 +221,7 @@ def loadTape():
     P0 = [20,20]
     P1 = [120, 60]
     P2 = [20,180]
+    P3 = [120, 140]
 
     fillclip = fillcliper(P0, P1, P2)
 
@@ -231,7 +232,23 @@ def loadTape():
         Left = min(PL[0], PR[0])
         Right = max(PL[0], PR[0])
         for column in range(Left,Right):
-            [pX, pY] = computePixel(P0, P1, P2, column, PR[1])
+            [pX, pY] = computePixel_UL(P0, P1, P2, column, PR[1])
+            if isPixelSet(pX, pY):
+                plot(column,PR[1])
+
+
+    fillclip = fillcliper(P1, P2, P3)
+
+    for (PL, PR) in fillclip:
+        # print (PL, PR)
+        plot(PL[0],PL[1])
+        plot(PR[0],PR[1])
+        Left = min(PL[0], PR[0])
+        Right = max(PL[0], PR[0])
+        for column in range(Left,Right):
+            [pX, pY] = computePixel_BR(P1, P2, P3, column, PR[1])
+            pY = min(pY, 199)
+            # print (column, PR[1],'=> ', pX, pY)
             if isPixelSet(pX, pY):
                 plot(column,PR[1])
 
