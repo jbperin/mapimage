@@ -16,7 +16,7 @@ def computePixel_BR(P1, P2, P3, xn, yn):
 
     cosgamma, singamma      = math.cos(gamma), math.sin(gamma)
     cosdelta, sindelta      = math.cos(delta), math.sin(delta)
-    # print (cosgamma, singamma )
+    # print (cosgamma, singamma)
     # print (cosdelta, sindelta)
     divisor                 = cosgamma * sindelta - cosdelta * singamma
 
@@ -43,10 +43,11 @@ def computePixel_UL(P0, P1, P2, xp, yp):
     [x2, y2] = P2
 
     # xp, yp = 12, 9
-
+    
     alpha                   = math.atan2(y1-y0, x1-x0)
     beta                    = math.atan2(y2-y0, x2-x0)
-
+    # print (y1-y0, x1-x0, alpha, round(alpha*127/math.pi))
+    # print (y2-y0, x2-x0, beta , round(beta*127/math.pi))
     cosalpha, sinalpha      =  math.cos(alpha), math.sin(alpha)
     cosbeta, sinbeta        =  math.cos(beta), math.sin(beta)
 
@@ -91,8 +92,19 @@ def main ():
     P1 = [120, 60]
     P2 = [20,180]
     P3 = [120, 140]
+    print (P0, P1, P2, P3)
+    # P1 = [20,20]
+    # P0 = [120, 60]
+    # P3 = [20,180]
+    # P2 = [120, 140]
+
+    # P1 = [20,20]
+    # P3 = [120, 60]
+    # P0 = [20,180]
+    # P2 = [120, 140]
 
     xp, yp = 20, 20
+    print (xp, yp)
     pixel = computePixel_UL(P0, P1, P2, xp, yp)
     print (pixel)
     xp, yp = 120, 60
@@ -104,6 +116,7 @@ def main ():
 
     print ("*******")
 
+
     xn, yn = 120, 60
     pixel = computePixel_BR(P1, P2, P3, xn, yn)
     print (pixel)
@@ -113,9 +126,16 @@ def main ():
     xn, yn = 120, 140
     pixel = computePixel_BR(P1, P2, P3, xn, yn)
     print (pixel)
-    xn, yn = 25, 178
-    pixel = computePixel_BR(P1, P2, P3, xn, yn)
-    print (pixel)
+
+    # xn, yn = 120, 60
+    # pixel = computePixel_BR(P1, P2, P3, xn, yn)
+    # print (pixel)
+    # xn, yn = 20, 20
+    # pixel = computePixel_BR(P1, P2, P3, xn, yn)
+    # print (pixel)
+    # xn, yn = 120, 140
+    # pixel = computePixel_BR(P1, P2, P3, xn, yn)
+    # print (pixel)
 
 
 if __name__ == '__main__':
