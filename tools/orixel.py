@@ -215,9 +215,7 @@ def isPixelSet (pC, pL):
 
 def loadTape():
     global theMemory
-    l = 100
-    c = 120
-    # pattern = 0b01101010
+
     P0 = [20,20]
     P1 = [120, 60]
     P2 = [20,180]
@@ -248,19 +246,11 @@ def loadTape():
         for column in range(Left,Right):
             [pX, pY] = computePixel_BR(P1, P2, P3, column, PR[1])
             pY = min(pY, 199)
+            pX = min(pX, 239)
             # print (column, PR[1],'=> ', pX, pY)
             if isPixelSet(pX, pY):
                 plot(column,PR[1])
 
-    # plot(c,l)
-
-    # hidx = c//6
-    # pidx = c%6
-    # theMemory.poke (HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx - 1, CHANGE_INK_TO_GREEN)
-    # cv = theMemory.peek (HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx);
-    # cv |= 0x20>>pidx;
-    # theMemory.poke (HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx, cv)
-    # theMemory.memcpy(HIRES_SCREEN_ADDRESS+l*SCREEN_WIDTH + hidx + 1, [pattern]*10, 4)
     DrawRam(img,theMemory.getRam())
 
 
