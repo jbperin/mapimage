@@ -9,37 +9,34 @@ def computePixel_BR(P1, P2, P3, xn, yn):
     [x1, y1] = P1
     [x2, y2] = P2
 
-    gamma                    = math.atan2(y2-y3, x2-x3)
-    delta                    = math.atan2(y3-y1, x3-x1)
+    norm32                  = math.sqrt((x2-x3)**2 + (y2-y3)**2)
+    norm31                  = math.sqrt((x1-x3)**2 + (y1-y3)**2)
+
+    gamma                   = math.atan2(y2-y3, x2-x3)
+    delta                   = math.atan2(y3-y1, x3-x1)
     # print (f"gamma = {math.degrees(gamma)}, delta = {math.degrees(delta)}")
 
-    cosgamma, singamma      = math.cos(gamma), math.sin(gamma)
-    cosdelta, sindelta      = math.cos(delta), math.sin(delta)
+    cosgamma, singamma     = math.cos(gamma), math.sin(gamma)
+    cosdelta, sindelta     = math.cos(delta), math.sin(delta)
     # print (cosgamma, singamma)
     # print (cosdelta, sindelta)
-    divisor                 = cosgamma * sindelta - cosdelta * singamma
+    divisor                = cosgamma * sindelta - cosdelta * singamma
 
-    W_RATIO                 = (IMAGE_WIDTH  / math.sqrt((x2-x3)**2 + (y2-y3)**2))/divisor          # norm (x3, y3, x2, y2)
-    H_RATIO                 = (IMAGE_HEIGHT / math.sqrt((x1-x3)**2 + (y1-y3)**2))/divisor          # norm (x3, y3, x1, y1)
+    W_RATIO                = (IMAGE_WIDTH  / norm32)/divisor          # norm (x3, y3, x2, y2)
+    H_RATIO                = (IMAGE_HEIGHT / norm31)/divisor          # norm (x3, y3, x1, y1)
 
-    K                       = sindelta * W_RATIO # /divisor
-    R                       = cosdelta * W_RATIO # /divisor
-    S                       = singamma * H_RATIO # /divisor
-    T                       = cosgamma * H_RATIO # /divisor
+    K                      = sindelta * W_RATIO # /divisor
+    R                      = cosdelta * W_RATIO # /divisor
+    S                      = singamma * H_RATIO # /divisor
+    T                      = cosgamma * H_RATIO # /divisor
 
-    r5                      = R*(yn - y3) - K*(xn - x3) 
-    r4                      = T*(yn - y3) - S*(xn - x3) 
+    r5                     = R*(yn - y3) - K*(xn - x3) 
+    r4                     = T*(yn - y3) - S*(xn - x3) 
     # print (f"divisor {divisor}, r5 = {r5}, r4 = {r4}")
 
-    Xpix, Ypix              = round(IMAGE_WIDTH + r5), round(IMAGE_HEIGHT + r4 )
+    Xpix, Ypix             = round(IMAGE_WIDTH + r5), round(IMAGE_HEIGHT + r4 )
 
     return [Xpix, Ypix]
-
-# computePixel_BR([4,2], [1.16, 6.29], [3.48, 4.57], 3.36, 3.39)
-
-# x0, y0 = 6, 3
-# x1, y1 = 18, 9
-# x2, y2 = 9, 14
 
 ## UP LEFT
 def computePixel_UL(P0, P1, P2, xp, yp):
@@ -48,7 +45,9 @@ def computePixel_UL(P0, P1, P2, xp, yp):
     [x2, y2] = P2
 
     # xp, yp = 12, 9
-    
+    norm01                  = math.sqrt((x1-x0)**2 + (y1-y0)**2)
+    norm02                  = math.sqrt((x2-x0)**2 + (y2-y0)**2)
+
     alpha                   = math.atan2(y1-y0, x1-x0)
     beta                    = math.atan2(y2-y0, x2-x0)
     # print (y1-y0, x1-x0, alpha, round(alpha*127/math.pi))
@@ -57,13 +56,13 @@ def computePixel_UL(P0, P1, P2, xp, yp):
     cosbeta, sinbeta        =  math.cos(beta), math.sin(beta)
 
     divisor                 = sinalpha*cosbeta - cosalpha*sinbeta
-    W_RATIO                 = (IMAGE_WIDTH / math.sqrt((x1-x0)**2 + (y1-y0)**2)) /divisor         # norm (x0, y0, x1, y1)
-    H_RATIO                 = (IMAGE_HEIGHT / math.sqrt((x2-x0)**2 + (y2-y0)**2))/divisor        # norm (x0, y0, x2, y2)
+    W_RATIO                 = (IMAGE_WIDTH / norm01) /divisor        
+    H_RATIO                 = (IMAGE_HEIGHT / norm02)/divisor
 
-    K                       = cosbeta  * W_RATIO # /divisor
-    R                       = sinbeta  * W_RATIO # /divisor
-    S                       = sinalpha * H_RATIO # /divisor
-    T                       = cosalpha * H_RATIO # /divisor
+    K                       = cosbeta  * W_RATIO
+    R                       = sinbeta  * W_RATIO
+    S                       = sinalpha * H_RATIO
+    T                       = cosalpha * H_RATIO
 
     r1                      = K*(yp-y0) - R*(xp-x0)
     r2                      = S*(xp-x0) - T*(yp-y0)
@@ -71,27 +70,6 @@ def computePixel_UL(P0, P1, P2, xp, yp):
     Xpix, Ypix              = round(r1 ), round(r2)
 
     return [Xpix, Ypix]
-
-
-
-# P0x, P0y = x0, y0
-# P1x, P1y = x1, y1
-# P2x, P2y = x2, y2
-
-# Px, Py = xp, yp
-
-# def det (ux, uy, vx, vy):
-#     return ux*vy - uy*vx
-
-
-# v1x, v1y = P1x-P0x, P1y - P0y
-# v2x, v2y = P2x-P0x, P2y - P0y
-# vx, vy = Px - P0x, Py - P0y
-
-# a = (det (vx, vy, v2x, v2y)- det(P0x, P0y, v2x, v2y))/det(v1x, v1y, v2x, v2y)
-# b = (det (vx, vy, v1x, v1y)- det(P0x, P0y, v1x, v1y))/det(v1x, v1y, v2x, v2y)
-
-# print (a*IMAGE_WIDTH, b*IMAGE_HEIGHT)
 
 
 def main ():
