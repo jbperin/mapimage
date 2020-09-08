@@ -12,32 +12,38 @@ def computePixel_BR(P1, P2, P3, xn, yn):
     [x1, y1] = P1
     [x2, y2] = P2
 
+    norm32                  = atanorm.norm(x2-x3,y2-y3)
+    norm31                  = atanorm.norm(x1-x3,y1-y3)
+    print (f"norm 32 = {norm32}, norm 31 = {norm31}")
+    # norm32                  = math.sqrt((x2-x3)**2 + (y2-y3)**2)
+    # norm31                  = math.sqrt((x1-x3)**2 + (y1-y3)**2)
+
     gamma                    = atanorm.atan2(y2-y3, x2-x3)
     delta                    = atanorm.atan2(y3-y1, x3-x1)
-
     print (f"gamma = {gamma*180/127}, delta = {delta*180/127}")
 
     cosgamma, singamma      = trigo.cos(gamma), trigo.sin(gamma)
     cosdelta, sindelta      = trigo.cos(delta), trigo.sin(delta)
-    print (cosgamma, singamma , cosgamma/32, singamma/32 )
-    print (cosdelta, sindelta, cosdelta/32, sindelta/32)
+    print ("cosgamma = %f, singamma = %f"%(cosgamma/32, singamma/32 ))
+    print ("cosdelta= %f sindelta = %f"%(cosdelta/32, sindelta/32))
 
-    divisor_part1 = cosgamma * sindelta
-    # divisor_part1 = atanorm.log2_tab[struct.unpack('B',struct.pack("b", cosgamma))[0]] + atanorm.log2_tab [struct.unpack('B',struct.pack("b", sindelta))[0]]
-    divisor_part2 = cosdelta * singamma
-    # divisor_part2 = atanorm.log2_tab[struct.unpack('B',struct.pack("b", cosdelta))[0]] + atanorm.log2_tab [struct.unpack('B',struct.pack("b", singamma))[0]]
-    if (abs(divisor_part1) > 255 or abs(divisor_part2) > 255) :
-        print ("WARNING : multiplication result out of bound", divisor_part1, divisor_part2)
-    # divisor                 = cosgamma * sindelta - cosdelta * singamma
-    divisor = divisor_part1 - divisor_part2
-    print (divisor)
-    # r5          = (sindelta*(xn - x3) - cosdelta*(yn - y3))/(divisor)
-    # r4          = (singamma*(xn - x3) - cosgamma*(yn - y3))/(divisor)
-    # # print (f"divisor {divisor}, r5 = {r5}, r4 = {r4}")
-    # W_RATIO                 = IMAGE_WIDTH / math.sqrt((x2-x3)**2 + (y2-y3)**2)          # norm (x3, y3, x2, y2)
-    # H_RATIO                 = IMAGE_HEIGHT / math.sqrt((x1-x3)**2 + (y1-y3)**2)         # norm (x3, y3, x1, y1)
+    divisor                = cosgamma * sindelta - cosdelta * singamma
+    print (f"divisor = {divisor/(32*32)}")
 
-    # Xpix, Ypix              = round(IMAGE_WIDTH-(r5 * W_RATIO)), round(IMAGE_HEIGHT - (r4 * H_RATIO))
+    W_RATIO                = (((IMAGE_WIDTH*32) // norm32)*32)//(divisor//32)          # norm (x3, y3, x2, y2)
+    H_RATIO                = (((IMAGE_HEIGHT*32) // norm31)*32)//(divisor//32)
+
+    print (f"W_RATIO = {W_RATIO/32}, H_RATIO = {H_RATIO/32}")
+
+    K                      = (sindelta * W_RATIO) # //(32*32)
+    R                      = (cosdelta * W_RATIO) # //(32*32)
+    S                      = (singamma * H_RATIO) # //(32*32)
+    T                      = (cosgamma * H_RATIO) # //(32*32)
+    print (f"K = {K/1024}, R = {R/1024}, S = {S/1024}, T = {T/1024}")
+
+    r5                     = R*(yn - y3) - K*(xn - x3) 
+    r4                     = T*(yn - y3) - S*(xn - x3) 
+    print (f"r5 = {r5/1024}, r4 = {r4/1204}")
 
     # return [Xpix, Ypix]
     return [0,0]
@@ -49,32 +55,32 @@ def computePixel_BR(P1, P2, P3, xn, yn):
 # x2, y2 = 9, 14
 
 ## UP LEFT
-def computePixel_UL(P0, P1, P2, xp, yp):
-    [x0, y0] = P0
-    [x1, y1] = P1
-    [x2, y2] = P2
+# def computePixel_UL(P0, P1, P2, xp, yp):
+#     [x0, y0] = P0
+#     [x1, y1] = P1
+#     [x2, y2] = P2
 
-    # xp, yp = 12, 9
-    alpha                   = math.atan2(y1-y0, x1-x0)
-    beta                    = math.atan2(y2-y0, x2-x0)
-    print (y1-y0, x1-x0, alpha, round(alpha*127/math.pi))
-    print (y2-y0, x2-x0, beta , round(beta*127/math.pi))
-    cosalpha, sinalpha      =  math.cos(alpha), math.sin(alpha)
-    cosbeta, sinbeta        =  math.cos(beta), math.sin(beta)
+#     # xp, yp = 12, 9
+#     alpha                   = math.atan2(y1-y0, x1-x0)
+#     beta                    = math.atan2(y2-y0, x2-x0)
+#     print (y1-y0, x1-x0, alpha, round(alpha*127/math.pi))
+#     print (y2-y0, x2-x0, beta , round(beta*127/math.pi))
+#     cosalpha, sinalpha      =  math.cos(alpha), math.sin(alpha)
+#     cosbeta, sinbeta        =  math.cos(beta), math.sin(beta)
 
-    divisor                 = sinalpha*cosbeta - cosalpha*sinbeta
+#     divisor                 = sinalpha*cosbeta - cosalpha*sinbeta
 
-    # r2prime                 = (sinalpha*(x0-xp) - cosalpha*(y0-yp) ) / divisor
-    # r1prime                 = (cosbeta*(y0-yp) - sinbeta*(x0-xp) ) / divisor
-    r1 = (sinbeta*(xp-x0)-cosbeta*(yp-y0))/(-divisor)
-    r2 = (sinalpha*(xp-x0)-cosalpha*(yp-y0))/divisor
-    W_RATIO                 = IMAGE_WIDTH / math.sqrt((x1-x0)**2 + (y1-y0)**2)          # norm (x0, y0, x1, y1)
-    H_RATIO                 = IMAGE_HEIGHT / math.sqrt((x2-x0)**2 + (y2-y0)**2)         # norm (x0, y0, x2, y2)
+#     # r2prime                 = (sinalpha*(x0-xp) - cosalpha*(y0-yp) ) / divisor
+#     # r1prime                 = (cosbeta*(y0-yp) - sinbeta*(x0-xp) ) / divisor
+#     r1 = (sinbeta*(xp-x0)-cosbeta*(yp-y0))/(-divisor)
+#     r2 = (sinalpha*(xp-x0)-cosalpha*(yp-y0))/divisor
+#     W_RATIO                 = IMAGE_WIDTH / math.sqrt((x1-x0)**2 + (y1-y0)**2)          # norm (x0, y0, x1, y1)
+#     H_RATIO                 = IMAGE_HEIGHT / math.sqrt((x2-x0)**2 + (y2-y0)**2)         # norm (x0, y0, x2, y2)
 
-    # Xpix, Ypix              = round(r1prime * W_RATIO), round(r2prime * H_RATIO)
-    Xpix, Ypix              = round(r1 * W_RATIO), round(r2 * H_RATIO)
+#     # Xpix, Ypix              = round(r1prime * W_RATIO), round(r2prime * H_RATIO)
+#     Xpix, Ypix              = round(r1 * W_RATIO), round(r2 * H_RATIO)
 
-    return [Xpix, Ypix]
+#     return [Xpix, Ypix]
 
 
 

@@ -11,28 +11,33 @@ def computePixel_BR(P1, P2, P3, xn, yn):
 
     norm32                  = math.sqrt((x2-x3)**2 + (y2-y3)**2)
     norm31                  = math.sqrt((x1-x3)**2 + (y1-y3)**2)
+    print (f"norm 32 = {norm32}, norm 31 = {norm31}")
 
     gamma                   = math.atan2(y2-y3, x2-x3)
     delta                   = math.atan2(y3-y1, x3-x1)
-    # print (f"gamma = {math.degrees(gamma)}, delta = {math.degrees(delta)}")
+    print (f"gamma = {math.degrees(gamma)}, delta = {math.degrees(delta)}")
 
     cosgamma, singamma     = math.cos(gamma), math.sin(gamma)
     cosdelta, sindelta     = math.cos(delta), math.sin(delta)
-    # print (cosgamma, singamma)
-    # print (cosdelta, sindelta)
+    print ("cosgamma = %f, singamma = %f"%(cosgamma, singamma))
+    print ("cosdelta= %f sindelta = %f"%(cosdelta, sindelta))
+
     divisor                = cosgamma * sindelta - cosdelta * singamma
+    print (f"divisor = {divisor}")
 
     W_RATIO                = (IMAGE_WIDTH  / norm32)/divisor          # norm (x3, y3, x2, y2)
     H_RATIO                = (IMAGE_HEIGHT / norm31)/divisor          # norm (x3, y3, x1, y1)
+    print (f"W_RATIO = {W_RATIO}, H_RATIO = {H_RATIO}")
 
-    K                      = sindelta * W_RATIO # /divisor
-    R                      = cosdelta * W_RATIO # /divisor
-    S                      = singamma * H_RATIO # /divisor
-    T                      = cosgamma * H_RATIO # /divisor
+    K                      = sindelta * W_RATIO
+    R                      = cosdelta * W_RATIO
+    S                      = singamma * H_RATIO
+    T                      = cosgamma * H_RATIO
+    print (f"K = {K}, R = {R}, S = {S}, T = {T}")
 
     r5                     = R*(yn - y3) - K*(xn - x3) 
     r4                     = T*(yn - y3) - S*(xn - x3) 
-    # print (f"divisor {divisor}, r5 = {r5}, r4 = {r4}")
+    print (f"r5 = {r5}, r4 = {r4}")
 
     Xpix, Ypix             = round(IMAGE_WIDTH + r5), round(IMAGE_HEIGHT + r4 )
 
