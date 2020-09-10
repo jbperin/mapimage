@@ -29,10 +29,15 @@ def computePixel_BR(P1, P2, P3, xn, yn):
     H_RATIO                = (IMAGE_HEIGHT / norm31)/divisor          # norm (x3, y3, x1, y1)
     print (f"W_RATIO = {W_RATIO}, H_RATIO = {H_RATIO}")
 
-    K                      = sindelta * W_RATIO
-    R                      = cosdelta * W_RATIO
-    S                      = singamma * H_RATIO
-    T                      = cosgamma * H_RATIO
+    # K                      = sindelta * W_RATIO
+    # R                      = cosdelta * W_RATIO
+    # S                      = singamma * H_RATIO
+    # T                      = cosgamma * H_RATIO
+
+    K = (sindelta * IMAGE_WIDTH) / (norm32*divisor)
+    R = (cosdelta * IMAGE_HEIGHT) / (norm32*divisor)
+    S = (singamma * IMAGE_HEIGHT) / (norm31*divisor)
+    T = (cosgamma * IMAGE_HEIGHT) / (norm31*divisor)
     print (f"K = {K}, R = {R}, S = {S}, T = {T}")
 
     r5                     = R*(yn - y3) - K*(xn - x3) 
@@ -52,25 +57,40 @@ def computePixel_UL(P0, P1, P2, xp, yp):
     # xp, yp = 12, 9
     norm01                  = math.sqrt((x1-x0)**2 + (y1-y0)**2)
     norm02                  = math.sqrt((x2-x0)**2 + (y2-y0)**2)
+    print (f"norm 01 = {norm01}, norm 02 = {norm02}")
 
     alpha                   = math.atan2(y1-y0, x1-x0)
     beta                    = math.atan2(y2-y0, x2-x0)
-    # print (y1-y0, x1-x0, alpha, round(alpha*127/math.pi))
-    # print (y2-y0, x2-x0, beta , round(beta*127/math.pi))
+    print (f"alpha = {math.degrees(alpha)}, beta = {math.degrees(beta)}")
+
     cosalpha, sinalpha      =  math.cos(alpha), math.sin(alpha)
     cosbeta, sinbeta        =  math.cos(beta), math.sin(beta)
+    print ("cosalpha = %f, sinalpha = %f"%(cosalpha, sinalpha))
+    print ("cosbeta= %f sinbeta = %f"%(cosbeta, sinbeta))
 
     divisor                 = sinalpha*cosbeta - cosalpha*sinbeta
+    print (f"divisor = {divisor}")
+
     W_RATIO                 = (IMAGE_WIDTH / norm01) /divisor        
     H_RATIO                 = (IMAGE_HEIGHT / norm02)/divisor
+    print (f"W_RATIO = {W_RATIO}, H_RATIO = {H_RATIO}")
 
-    K                       = cosbeta  * W_RATIO
-    R                       = sinbeta  * W_RATIO
-    S                       = sinalpha * H_RATIO
-    T                       = cosalpha * H_RATIO
+
+    # K                       = cosbeta  * W_RATIO
+    # R                       = sinbeta  * W_RATIO
+    # S                       = sinalpha * H_RATIO
+    # T                       = cosalpha * H_RATIO
+
+    K = (cosbeta  * IMAGE_WIDTH) / (norm01*divisor)
+    R = (sinbeta  * IMAGE_WIDTH) / (norm01*divisor)
+    S = (sinalpha * IMAGE_HEIGHT) / (norm02*divisor)
+    T = (cosalpha * IMAGE_HEIGHT) / (norm02*divisor)
+
+    print (f"K = {K}, R = {R}, S = {S}, T = {T}")
 
     r1                      = K*(yp-y0) - R*(xp-x0)
     r2                      = S*(xp-x0) - T*(yp-y0)
+    print (f"r1 = {r1}, r2 = {r2}")
 
     Xpix, Ypix              = round(r1 ), round(r2)
 
