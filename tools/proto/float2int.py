@@ -171,8 +171,8 @@ def main():
 
     P0, P1, P2 = [6, 3], [15, 10], [2,13]
     
-    fillclip = fillcliper(P0, P1, P2)
-    triul = Triangle_UL(P0, P1, P2)
+    fillclip    = fillcliper(P0, P1, P2)
+    triul       = Triangle_UL(P0, P1, P2)
     for (PL, PR) in fillclip:
         print (PL, PR)
         Left = min(PL[0], PR[0])
