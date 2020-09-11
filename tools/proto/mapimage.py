@@ -11,23 +11,23 @@ def computePixel_BR(P1, P2, P3, xn, yn):
 
     norm32                  = math.sqrt((x2-x3)**2 + (y2-y3)**2)
     norm31                  = math.sqrt((x1-x3)**2 + (y1-y3)**2)
-    print (f"norm 32 = {norm32}, norm 31 = {norm31}")
+    # print (f"norm 32 = {norm32}, norm 31 = {norm31}")
 
     gamma                   = math.atan2(y2-y3, x2-x3)
     delta                   = math.atan2(y3-y1, x3-x1)
-    print (f"gamma = {math.degrees(gamma)}, delta = {math.degrees(delta)}")
+    # print (f"gamma = {math.degrees(gamma)}, delta = {math.degrees(delta)}")
 
     cosgamma, singamma     = math.cos(gamma), math.sin(gamma)
     cosdelta, sindelta     = math.cos(delta), math.sin(delta)
-    print ("cosgamma = %f, singamma = %f"%(cosgamma, singamma))
-    print ("cosdelta= %f sindelta = %f"%(cosdelta, sindelta))
+    # print ("cosgamma = %f, singamma = %f"%(cosgamma, singamma))
+    # print ("cosdelta= %f sindelta = %f"%(cosdelta, sindelta))
 
     divisor                = cosgamma * sindelta - cosdelta * singamma
-    print (f"divisor = {divisor}")
+    # print (f"divisor = {divisor}")
 
     W_RATIO                = (IMAGE_WIDTH  / norm32)/divisor          # norm (x3, y3, x2, y2)
     H_RATIO                = (IMAGE_HEIGHT / norm31)/divisor          # norm (x3, y3, x1, y1)
-    print (f"W_RATIO = {W_RATIO}, H_RATIO = {H_RATIO}")
+    # print (f"W_RATIO = {W_RATIO}, H_RATIO = {H_RATIO}")
 
     # K                      = sindelta * W_RATIO
     # R                      = cosdelta * W_RATIO
@@ -38,11 +38,11 @@ def computePixel_BR(P1, P2, P3, xn, yn):
     R = (cosdelta * IMAGE_HEIGHT) / (norm32*divisor)
     S = (singamma * IMAGE_HEIGHT) / (norm31*divisor)
     T = (cosgamma * IMAGE_HEIGHT) / (norm31*divisor)
-    print (f"K = {K}, R = {R}, S = {S}, T = {T}")
+    # print (f"K = {K}, R = {R}, S = {S}, T = {T}")
 
     r5                     = R*(yn - y3) - K*(xn - x3) 
     r4                     = T*(yn - y3) - S*(xn - x3) 
-    print (f"r5 = {r5}, r4 = {r4}")
+    # print (f"r5 = {r5}, r4 = {r4}")
 
     Xpix, Ypix             = round(IMAGE_WIDTH + r5), round(IMAGE_HEIGHT + r4 )
 
@@ -57,23 +57,23 @@ def computePixel_UL(P0, P1, P2, xp, yp):
     # xp, yp = 12, 9
     norm01                  = math.sqrt((x1-x0)**2 + (y1-y0)**2)
     norm02                  = math.sqrt((x2-x0)**2 + (y2-y0)**2)
-    print (f"norm 01 = {norm01}, norm 02 = {norm02}")
+    # print (f"norm 01 = {norm01}, norm 02 = {norm02}")
 
     alpha                   = math.atan2(y1-y0, x1-x0)
     beta                    = math.atan2(y2-y0, x2-x0)
-    print (f"alpha = {math.degrees(alpha)}, beta = {math.degrees(beta)}")
+    # print (f"alpha = {math.degrees(alpha)}, beta = {math.degrees(beta)}")
 
     cosalpha, sinalpha      =  math.cos(alpha), math.sin(alpha)
     cosbeta, sinbeta        =  math.cos(beta), math.sin(beta)
-    print ("cosalpha = %f, sinalpha = %f"%(cosalpha, sinalpha))
-    print ("cosbeta= %f sinbeta = %f"%(cosbeta, sinbeta))
+    # print ("cosalpha = %f, sinalpha = %f"%(cosalpha, sinalpha))
+    # print ("cosbeta= %f sinbeta = %f"%(cosbeta, sinbeta))
 
     divisor                 = sinalpha*cosbeta - cosalpha*sinbeta
-    print (f"divisor = {divisor}")
+    # print (f"divisor = {divisor}")
 
     W_RATIO                 = (IMAGE_WIDTH / norm01) /divisor        
     H_RATIO                 = (IMAGE_HEIGHT / norm02)/divisor
-    print (f"W_RATIO = {W_RATIO}, H_RATIO = {H_RATIO}")
+    # print (f"W_RATIO = {W_RATIO}, H_RATIO = {H_RATIO}")
 
 
     # K                       = cosbeta  * W_RATIO
@@ -86,11 +86,11 @@ def computePixel_UL(P0, P1, P2, xp, yp):
     S = (sinalpha * IMAGE_HEIGHT) / (norm02*divisor)
     T = (cosalpha * IMAGE_HEIGHT) / (norm02*divisor)
 
-    print (f"K = {K}, R = {R}, S = {S}, T = {T}")
+    # print (f"K = {K}, R = {R}, S = {S}, T = {T}")
 
     r1                      = K*(yp-y0) - R*(xp-x0)
     r2                      = S*(xp-x0) - T*(yp-y0)
-    print (f"r1 = {r1}, r2 = {r2}")
+    # print (f"r1 = {r1}, r2 = {r2}")
 
     Xpix, Ypix              = round(r1 ), round(r2)
 

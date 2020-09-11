@@ -209,9 +209,12 @@ def isPixelSet (pC, pL):
     bytesIndexInLine = pC // 6 
     bitNumberInBytes = pC % 6
     cv = 0x20 >> bitNumberInBytes
+    print (bytesIndexInLine, pL)
     theByte =  imageBuffer[bytesIndexInLine  + pL * 40]
     val = cv & theByte
     return (val!=0)
+
+import proto.float2int 
 
 def loadTape():
     global theMemory
@@ -233,18 +236,26 @@ def loadTape():
     # P2 = [120, 140]
 
 
-    fillclip = fillcliper(P0, P1, P2)
+    # fillclip = fillcliper(P0, P1, P2)
 
-    for (PL, PR) in fillclip:
-        # print (PL, PR)
-        plot(PL[0],PL[1])
-        plot(PR[0],PR[1])
-        Left = min(PL[0], PR[0])
-        Right = max(PL[0], PR[0])
-        for column in range(Left,Right):
-            [pX, pY] = computePixel_UL(P0, P1, P2, column, PR[1])
-            if isPixelSet(pX, pY):
-                plot(column,PR[1])
+    # for (PL, PR) in fillclip:
+    #     # print (PL, PR)
+    #     plot(PL[0],PL[1])
+    #     plot(PR[0],PR[1])
+    #     Left = min(PL[0], PR[0])
+    #     Right = max(PL[0], PR[0])
+    #     for column in range(Left,Right):
+    #         [pX, pY] = computePixel_UL(P0, P1, P2, column, PR[1])
+    #         if isPixelSet(pX, pY):
+    #             plot(column,PR[1])
+
+
+    triul       = proto.float2int.Triangle_UL(P0, P1, P2)
+    for (x, y, pix, piy) in triul.next():
+        # print (x, y, " => ",pix, piy)
+        if isPixelSet(pix, piy):
+            plot(x, y)
+
 
 
     fillclip = fillcliper(P1, P2, P3)

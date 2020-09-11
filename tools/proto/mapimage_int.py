@@ -94,16 +94,16 @@ def computePixel_UL(P0, P1, P2, xp, yp):
     # S                       = sinalpha * H_RATIO
     # T                       = cosalpha * H_RATIO
 
-    K = (cosbeta  *32 *32 *32 * IMAGE_WIDTH) / (norm01*divisor)
-    R = (sinbeta  *32 *32 *32 * IMAGE_WIDTH) / (norm01*divisor)
-    S = (sinalpha *32 *32 *32 * IMAGE_HEIGHT) / (norm02*divisor)
-    T = (cosalpha *32 *32 *32 * IMAGE_HEIGHT) / (norm02*divisor)
+    Ka, Kb = (cosbeta  *32 *32 *32 * IMAGE_WIDTH)  , (norm01*divisor)
+    Ra, Rb = (sinbeta  *32 *32 *32 * IMAGE_WIDTH)  , (norm01*divisor)
+    Sa, Sb = (sinalpha *32 *32 *32 * IMAGE_HEIGHT) , (norm02*divisor)
+    Ta, Tb = (cosalpha *32 *32 *32 * IMAGE_HEIGHT) , (norm02*divisor)
 
+    
+    print (f"K = {(Ka/Kb)/1024}, R = {(Ra/Rb)/1024}, S = {(Sa/Sb)/1024}, T = {(Ta/Tb)/1024}")
 
-    print (f"K = {K/1024}, R = {R/1024}, S = {S/1024}, T = {T/1024}")
-
-    r1                      = K*(yp-y0) - R*(xp-x0)
-    r2                      = S*(xp-x0) - T*(yp-y0)
+    r1                      = (Ka/Kb)*(yp-y0) - (Ra/Rb)*(xp-x0)
+    r2                      = (Sa/Sb)*(xp-x0) - (Ta/Tb)*(yp-y0)
     print (f"r1 = {r1/1024}, r2 = {r2/1204}")
 
     Xpix, Ypix              = round(r1/1024), round(r2/1024)

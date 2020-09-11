@@ -258,7 +258,8 @@ tab_exp = [
 
 
 strexp = "tab_exp = [\n" + ", ".join(map(lambda x: "0x%02x"%(x), tab_exp)) + "]\n"
-print (strexp)
+
+
 def main ():
 
     print (atan2 (40,100)) # ==> 15
