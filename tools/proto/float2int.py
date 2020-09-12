@@ -1,5 +1,10 @@
-from proto import atanorm
-from proto import trigo
+try:
+    import atanorm
+    import trigo
+except :
+    import proto.atanorm as atanorm
+    import proto.trigo as trigo
+    
 import math
 IMAGE_WIDTH, IMAGE_HEIGHT    = 240, 200
 
