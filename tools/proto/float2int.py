@@ -4,7 +4,7 @@ try:
 except :
     import proto.atanorm as atanorm
     import proto.trigo as trigo
-    
+
 import math
 IMAGE_WIDTH, IMAGE_HEIGHT    = 240, 200
 
@@ -130,6 +130,122 @@ def fillcliper (p1, p2, p3):
             # print (a1.stepY(), a2.stepY())
             yield a1.stepY(), a2.stepY()
 
+
+class Triangle_BR:
+    def __init__(self, P1, P2, P3):
+        [x3, y3] = P3
+        [x1, y1] = P1
+        [x2, y2] = P2
+
+        self.fillclip    = fillcliper(P1, P2, P3)
+
+        norm32                  = atanorm.norm(x2-x3,y2-y3)
+        norm31                  = atanorm.norm(x1-x3,y1-y3)
+        print (f"norm 32 = {norm32}, norm 31 = {norm31}")
+        # norm32                  = math.sqrt((x2-x3)**2 + (y2-y3)**2)
+        # norm31                  = math.sqrt((x1-x3)**2 + (y1-y3)**2)
+
+        gamma                    = atanorm.atan2(y2-y3, x2-x3)
+        delta                    = atanorm.atan2(y3-y1, x3-x1)
+        print (f"gamma = {gamma*180/127}, delta = {delta*180/127}")
+
+        cosgamma, singamma      = trigo.cos(gamma), trigo.sin(gamma)
+        cosdelta, sindelta      = trigo.cos(delta), trigo.sin(delta)
+        print ("cosgamma = %f, singamma = %f"%(cosgamma/32, singamma/32 ))
+        print ("cosdelta= %f sindelta = %f"%(cosdelta/32, sindelta/32))
+
+        divisor                = cosgamma * sindelta - cosdelta * singamma
+        print (f"divisor = {divisor/(32*32)}")
+
+        W_RATIO                = (((IMAGE_WIDTH*32) // norm32)*32)//(divisor//32)          # norm (x3, y3, x2, y2)
+        H_RATIO                = (((IMAGE_HEIGHT*32) // norm31)*32)//(divisor//32)
+
+        print (f"W_RATIO = {W_RATIO/32}, H_RATIO = {H_RATIO/32}")
+
+        # K                      = (sindelta * W_RATIO) 
+        # R                      = (cosdelta * W_RATIO) 
+        # S                      = (singamma * H_RATIO) 
+        # T                      = (cosgamma * H_RATIO) 
+
+        K = (sindelta  *32 *32 *32 * IMAGE_WIDTH) / (norm32*divisor)
+        R = (cosdelta  *32 *32 *32 * IMAGE_WIDTH) / (norm32*divisor)
+        S = (singamma *32 *32 *32 * IMAGE_HEIGHT) / (norm31*divisor)
+        T = (cosgamma *32 *32 *32 * IMAGE_HEIGHT) / (norm31*divisor)
+
+        print (f"K = {K/1024}, R = {R/1024}, S = {S/1024}, T = {T/1024}")
+
+        self.Ka, self.Kb = (sindelta  *32 *32 *32 * IMAGE_WIDTH)  , (norm32*divisor)
+        self.Ra, self.Rb = (cosdelta  *32 *32 *32 * IMAGE_WIDTH)  , (norm32*divisor)
+        self.Sa, self.Sb = (singamma *32 *32 *32 * IMAGE_HEIGHT) , (norm31*divisor)
+        self.Ta, self.Tb = (cosgamma *32 *32 *32 * IMAGE_HEIGHT) , (norm31*divisor)
+
+        # print (f"K = {(self.Ka/self.Kb)/1024}, R = {(self.Ra/self.Rb)/1024}, S = {(self.Sa/self.Sb)/1024}, T = {(self.Ta/self.Tb)/1024}")
+
+        self.x3, self.y3 = x3, y3
+        self.x1, self.y1 = x1, y1
+        self.x2, self.y2 = x2, y2
+
+    def getPixel (self, xn, yn):
+
+        r5                     = (self.Ra/self.Rb)*(yn - self.y3) - (self.Ka/self.Kb)*(xn - self.x3) # R*(yn - y3) - K*(xn - x3) 
+        r4                     = (self.Ta/self.Tb)*(yn - self.y3) - (self.Sa/self.Sb)*(xn - self.x3) # T*(yn - y3) - S*(xn - x3) 
+        # print (f"r5 = {r5/1024}, r4 = {r4/1204}")
+
+        Xpix, Ypix             = round(IMAGE_WIDTH + r5/1024), round(IMAGE_HEIGHT + r4/1024 )
+        return [Xpix, Ypix]
+
+    def getAccuratePixel (self, xn, yn):
+
+        norm32                  = math.sqrt((self.x2-self.x3)**2 + (self.y2-self.y3)**2)
+        norm31                  = math.sqrt((self.x1-self.x3)**2 + (self.y1-self.y3)**2)
+        # print (f"norm 32 = {norm32}, norm 31 = {norm31}")
+
+        gamma                   = math.atan2(self.y2-self.y3, self.x2-self.x3)
+        delta                   = math.atan2(self.y3-self.y1, self.x3-self.x1)
+        # print (f"gamma = {math.degrees(gamma)}, delta = {math.degrees(delta)}")
+
+        cosgamma, singamma     = math.cos(gamma), math.sin(gamma)
+        cosdelta, sindelta     = math.cos(delta), math.sin(delta)
+        # print ("cosgamma = %f, singamma = %f"%(cosgamma, singamma))
+        # print ("cosdelta= %f sindelta = %f"%(cosdelta, sindelta))
+
+        divisor                = cosgamma * sindelta - cosdelta * singamma
+        # print (f"divisor = {divisor}")
+
+        W_RATIO                = (IMAGE_WIDTH  / norm32)/divisor          # norm (x3, y3, x2, y2)
+        H_RATIO                = (IMAGE_HEIGHT / norm31)/divisor          # norm (x3, y3, x1, y1)
+        # print (f"W_RATIO = {W_RATIO}, H_RATIO = {H_RATIO}")
+
+        # K                      = sindelta * W_RATIO
+        # R                      = cosdelta * W_RATIO
+        # S                      = singamma * H_RATIO
+        # T                      = cosgamma * H_RATIO
+
+        K = (sindelta * IMAGE_WIDTH) / (norm32*divisor)
+        R = (cosdelta * IMAGE_HEIGHT) / (norm32*divisor)
+        S = (singamma * IMAGE_HEIGHT) / (norm31*divisor)
+        T = (cosgamma * IMAGE_HEIGHT) / (norm31*divisor)
+        # print (f"K = {K}, R = {R}, S = {S}, T = {T}")
+
+        r5                     = R*(yn - self.y3) - K*(xn - self.x3) 
+        r4                     = T*(yn - self.y3) - S*(xn - self.x3) 
+        # print (f"r5 = {r5}, r4 = {r4}")
+
+        Xpix, Ypix             = round(IMAGE_WIDTH + r5), round(IMAGE_HEIGHT + r4 )
+
+        return [Xpix, Ypix]
+
+    def next(self):
+        for (PL, PR) in self.fillclip:
+            Left = min(PL[0], PR[0])
+            Right = max(PL[0], PR[0])
+            for i in range (Left, Right+1):
+                pix, piy = self.getPixel(i, PR[1])
+                
+                yield i, PR[1], min(max(pix,0), IMAGE_WIDTH-1), min(max(piy,0), IMAGE_HEIGHT-1)
+
+
+
 class Triangle_UL:
     def __init__(self, P0, P1, P2):
         [x0, y0] = P0
@@ -178,11 +294,11 @@ class Triangle_UL:
         self.x1, self.y1 = x1, y1
         self.x2, self.y2 = x2, y2
 
-        self.currentX = self.x0
-        self.currentY = self.y0
+        # self.currentX = self.x0
+        # self.currentY = self.y0
 
-        self.endX = self.x0
-        self.endY = self.y0
+        # self.endX = self.x0
+        # self.endY = self.y0
 
         # r1                      = (Ka/Kb)*(yp-y0) - (Ra/Rb)*(xp-x0)
         # r2                      = (Sa/Sb)*(xp-x0) - (Ta/Tb)*(yp-y0)

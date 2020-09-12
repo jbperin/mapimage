@@ -260,19 +260,27 @@ def loadTape():
 
     fillclip = fillcliper(P1, P2, P3)
 
-    for (PL, PR) in fillclip:
-        # print (PL, PR)
-        plot(PL[0],PL[1])
-        plot(PR[0],PR[1])
-        Left = min(PL[0], PR[0])
-        Right = max(PL[0], PR[0])
-        for column in range(Left,Right):
-            [pX, pY] = computePixel_BR(P1, P2, P3, column, PR[1])
-            pY = min(pY, 199)
-            pX = min(pX, 239)
-            # print (column, PR[1],'=> ', pX, pY)
-            if isPixelSet(pX, pY):
-                plot(column,PR[1])
+    # for (PL, PR) in fillclip:
+    #     # print (PL, PR)
+    #     plot(PL[0],PL[1])
+    #     plot(PR[0],PR[1])
+    #     Left = min(PL[0], PR[0])
+    #     Right = max(PL[0], PR[0])
+    #     for column in range(Left,Right):
+    #         [pX, pY] = computePixel_BR(P1, P2, P3, column, PR[1])
+    #         pY = min(pY, 199)
+    #         pX = min(pX, 239)
+    #         # print (column, PR[1],'=> ', pX, pY)
+    #         if isPixelSet(pX, pY):
+    #             plot(column,PR[1])
+
+    tribr       = proto.float2int.Triangle_BR(P1, P2, P3)
+    for (x, y, pix, piy) in tribr.next():
+        # print (x, y, " => ",pix, piy)
+        if isPixelSet(pix, piy):
+            plot(x, y)
+
+
 
     DrawRam(img,theMemory.getRam())
 
