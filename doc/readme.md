@@ -12,6 +12,8 @@ Unfortunately I don't have any running program to show. I only have an idea of a
 What I call image mapping is the fact to apply an image to a shape on screen which is not neccessarly rectangular. 
 [img]https://raw.githubusercontent.com/jbperin/mapimage/master/doc/img/Context.PNG[/img]
 
+![](img/Context.PNG)
+
 As far as I know, the only attempt that was done to do such thing was in the intro of 1337 game, where the intro text scrolls on the screen with a stunning perspective effect like in Star Wars movies: 
 [url]https://youtu.be/62lJQJy-v6w?t=31[/url]
 
@@ -21,6 +23,8 @@ The underlying question being : "Is there a space between 3D munch and wolfenste
 In glOric, like in most 3D render engine, surfaces are made of triangles. And a rectangular image shall thus be mapped on two triangles.
 In the image below I introduce this principle and I start positionning the problem on a single triangle.
 [img]https://raw.githubusercontent.com/jbperin/mapimage/master/doc/img/Triangle.PNG[/img]
+
+![](img/Triangle.PNG)
 
 The problem I wanted to adress is the following one. If I want to fill the triangle P0, P1, P2 on the screen (right part of the image), I need to find for a given P point, the pixel coordinate of P in the original image (left part of the previous image)
 
